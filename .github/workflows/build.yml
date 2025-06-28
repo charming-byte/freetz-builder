@@ -1,0 +1,32 @@
+name: Freetz-NG Auto-Build
+
+on:
+  schedule:
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    env:
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      MATTERMOST_WEBHOOK: ${{ secrets.MATTERMOST_WEBHOOK }}
+      GH_EMAIL_ADDRESS: "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+
+    steps:
+      - name: Checkout your repo
+        uses: actions/checkout@v4
+
+      - name: Run build
+        run: |
+          chmod +x build.sh
+          bash ./build.sh
+
+      - name: Upload firmware artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware
+          path: freetz-ng/images/*.image
